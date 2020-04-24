@@ -1,5 +1,5 @@
 # takehome-alloy-api
-This is the API and Cron portion of the Alloy take home project. The web portion (which consumes this API) is [here].(https://github.com/mmattax/takehome-alloy-web)
+This is the API and Cron portion of the Alloy take home project. The web portion (which consumes this API) is [here](https://github.com/mmattax/takehome-alloy-web).
 
 ## Setup
 

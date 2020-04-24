@@ -1,5 +1,12 @@
 version: "3.7"
 services:
+    api:
+      build: .
+      command: npm run start
+      volumes: 
+        - './opt/api'
+      ports:
+        - '5000:5000'
     mongo:
       image: 'mongo:4'
       environment: 

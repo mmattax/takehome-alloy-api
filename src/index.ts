@@ -55,7 +55,6 @@ MongoClient.connect(process.env.MONGO_URL || '', {
     });
 
     /**
-     * 
      * Hot Module Replacement
      * https://webpack.js.org/guides/hot-module-replacement/
      */

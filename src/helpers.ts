@@ -8,11 +8,10 @@ import { Db } from 'mongodb';
 import { CronJob } from 'cron';
 
 /**
- * Builds a cropn job to post the news to Slack teams at
- * 9AM PT
+ * Builds a cron job to post the news to Slack teams at 9AM PT
  * @param db 
  */
-export function makeCronJob(db: Db) : CronJob {
+export function makeCronJob(db: Db): CronJob {
     return new CronJob('0 0 9 * * *', () => {
         const teamCollection = db.collection('teams')
         const teams = teamCollection.find().forEach(team => {
@@ -35,24 +34,30 @@ export async function getSlackAccessToken(data: SlackAccessTokenRequest): Promis
         }
     }
     const res = await axios.post(
-        url, 
-        qs.stringify(data), 
+        url,
+        qs.stringify(data),
         config
     );
     return res.data;
 }
 
-export async function postNewsToSlack(webhookUrl: string, triggeredBy: string|null) {
+/**
+ * Post new items to Slack
+ * @param webhookUrl 
+ * @param triggeredBy 
+ */
+export async function postNewsToSlack(webhookUrl: string, triggeredBy: string | null) {
     parseInTheNews().then(news => {
-        const text   = 'In the news: ' + moment().format('LL');
-        const blocks:any = [
-            {
-                type: 'section',
-                text: {
-                    type: 'mrkdwn',
-                    text: `*${text}*`
-                }
-            }, {
+        const text = 'In the news: ' + moment().format('LL');
+        const blocks: any = [{
+            type: 'section',
+            text: {
+                type: 'mrkdwn',
+                text: `*${text}*`
+            }
+        }];
+        if (triggeredBy !== null) {
+            blocks.push({
                 type: 'context',
                 "elements": [
                     {
@@ -60,9 +65,8 @@ export async function postNewsToSlack(webhookUrl: string, triggeredBy: string|nu
                         "text": triggeredBy
                     }
                 ]
-            }
-           
-        ];
+            });
+        }
         blocks.push(...formatLinksForSlack(news))
         return postToSlack(webhookUrl, text, blocks);
     });
@@ -75,7 +79,7 @@ export async function postNewsToSlack(webhookUrl: string, triggeredBy: string|nu
  * @param blocks 
  */
 export async function postToSlack(webhookUrl: string, text: string, blocks: Array<any> = []) {
-    const data:any = { text: text };
+    const data: any = { text: text };
     if (blocks.length) {
         data.blocks = blocks;
     }
@@ -118,7 +122,7 @@ export async function parseInTheNews(): Promise<Link[]> {
     const res = await axios.get(url);
 
     const $ = cheerio.load(res.data);
-    const links:Link[] = [];
+    const links: Link[] = [];
     /**
      * Parse the "In the News" section
      * 
@@ -127,8 +131,8 @@ export async function parseInTheNews(): Promise<Link[]> {
      * 
      * The news items currently look like the only direct child of 
      * #mp-itn that's a ul.
-     */ 
-    $("#mp-itn > ul").children().each((i, li) => { 
+     */
+    $("#mp-itn > ul").children().each((i, li) => {
 
         const label = $(li).text();
 
